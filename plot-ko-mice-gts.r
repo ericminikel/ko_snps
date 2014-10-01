@@ -4,13 +4,13 @@ gt = read.table('~/d/sci/src/ko_snps/nuvolone-ko-mice-genotypes.txt',sep='\t',he
 
 colnames(gt) = tolower(colnames(gt)) # lower case column names
 
-color_b6 = '#222222'
-color_129 = '#B28647' # cappucino - http://www.december.com/html/spec/color1.html
-color_het = '#685434' # halfway between above
+color_b6    = '#222222'
+color_129   = '#DB2929' # 
+color_het   = '#685434' # halfway between above
 color_lines = '#FC1501' # gummi red - http://www.december.com/html/spec/color1.html
-color_bg = '#AAAAAA' # background color
+color_bg    = '#AAAAAA' # background color
 
-value_b6 = 1
+value_b6  = 1
 value_129 = 0
 value_het = 0.5
 
@@ -41,13 +41,13 @@ chrmids = (chrbreaks[1:(length(chrbreaks)-1)] + chrbreaks[2:length(chrbreaks)]) 
 
 # test plotting the chromosome boundaries
 par(mfrow=c(1,1))
-plot(NA,NA,xlim=range(gt$abspos),ylim=c(0,1))
+plot(NA,NA,xlim=c(0,max(gt$abspos)),ylim=c(0,1),xaxs='i',axes=FALSE)
 abline(v=chrbreaks)
 mtext(side=1,at=chrmids,text=chrlen$chr)
 
 colnames(gt)
 
-plot_order = 5:15 # which columns to plot, and in what order
+plot_order = c(6,5,8,7,9,11,10,12,13,15,14) # which columns to plot, and in what order
 display_names = colnames(gt)
 # placeholder - can add nicer-looking names later
 
@@ -59,10 +59,7 @@ for (colno in plot_order) {
        yaxt='n',xaxt='n',ylab='',xlab='',cex.lab=2)
   mtext(side=2,text=paste(display_names[colno],"  "),las=1)
   rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col=color_bg)
-  m129 = gt[,colno]==value_129 & !is.na(gt[,colno])
-  if (sum(m129) > 0) {
-      points(gt$abspos[m129],rep(1,sum(m129)),col=color_129,type='h',lwd=2,lend=2)
-  }
+
   het = gt[,colno]==value_het & !is.na(gt[,colno])
   if (sum(het) > 0) {
       points(gt$abspos[het],rep(1,sum(het)),col=color_het,type='h',lwd=2,lend=2)
@@ -71,8 +68,12 @@ for (colno in plot_order) {
   if (sum(b6) > 0) {
     points(gt$abspos[b6],rep(1,sum(b6)),col=color_b6,type='h',lwd=2,lend=2)
   }
+  m129 = gt[,colno]==value_129 & !is.na(gt[,colno])
+  if (sum(m129) > 0) {
+    points(gt$abspos[m129],rep(1,sum(m129)),col=color_129,type='h',lwd=2,lend=2)
+  }
   axis(side=1,at=c(1,chrbreaks),labels=NA)
-  if (iteration == 6) {
+  if (iteration == length(plot_order)) {
       mtext(side=1,at=chrmids,text=chrlen$chr,cex=.6)  
   } 
   iteration = iteration + 1
