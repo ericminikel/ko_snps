@@ -1,8 +1,8 @@
 options(stringsAsFactors=FALSE)
 require(sqldf)
-gt = read.table('~/d/j/cureffilab/media/2014/08/nuvolone-ko-mice-genotypes.txt',sep='\t',header=TRUE)
+gt = read.table('~/d/sci/src/ko_snps/nuvolone-ko-mice-genotypes.txt',sep='\t',header=TRUE)
 
-gt$chr[which(gt$edbg==1)]
+colnames(gt) = tolower(colnames(gt)) # lower case column names
 
 color_b6 = '#222222'
 color_129 = '#B28647' # cappucino - http://www.december.com/html/spec/color1.html
@@ -14,12 +14,9 @@ value_b6 = 1
 value_129 = 0
 value_het = 0.5
 
-# remove SNPs that are not B6/129 informative
-gt = gt[gt$differentiate=="",]
-
 # get lengths of each chromosome (highest SNP pos is fine)
 chrlen = sqldf("
-select   chr, max(pos) maxpos
+select   chr, max(position) maxpos
 from     gt
 group by 1
 order by 1
@@ -41,19 +38,21 @@ gt$chrmax = gt$pos == chrlen$maxpos[match(gt$chr,chrlen$chr)]
 chrbreaks = c(0,gt$abspos[gt$chrmax])
 # find places to label chromosomes - midpoint between each line
 chrmids = (chrbreaks[1:(length(chrbreaks)-1)] + chrbreaks[2:length(chrbreaks)]) / 2
-# test:
+
+# test plotting the chromosome boundaries
+par(mfrow=c(1,1))
 plot(NA,NA,xlim=range(gt$abspos),ylim=c(0,1))
 abline(v=chrbreaks)
 mtext(side=1,at=chrmids,text=chrlen$chr)
 
-plot(gt$abspos,gt$zh1,type='h',col='#000000')
+colnames(gt)
 
-plot_order = c(8,9,10,11,12,13)
+plot_order = 5:15 # which columns to plot, and in what order
 display_names = colnames(gt)
-display_names[plot_order] = c("C57BL/6J","B6 WT","ZrchIII","ZrchI","129/Ola","Edbg")
+# placeholder - can add nicer-looking names later
 
-pdf('~/d/j/cureffilab/media/2014/08/ko-mice-genotypes-20140806.pdf',width=8,height=5)
-par(mfrow=c(7,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
+pdf('~/d/sci/src/ko_snps/ko-mice-genotypes.pdf',width=8,height=5)
+par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
 iteration = 1
 for (colno in plot_order) {
   plot(NA,NA,xlim=range(gt$abspos),ylim=c(0,1),yaxs='i',xaxs='i',
