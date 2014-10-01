@@ -14,6 +14,11 @@ value_b6  = 1
 value_129 = 0
 value_het = 0.5
 
+colordict = list()
+colordict[[as.character(value_b6)]] = color_b6
+colordict[[as.character(value_het)]] = color_het
+colordict[[as.character(value_129)]] = color_129
+
 # get lengths of each chromosome (highest SNP pos is fine)
 chrlen = sqldf("
 select   chr, max(position) maxpos
@@ -39,6 +44,16 @@ chrbreaks = c(0,gt$abspos[gt$chrmax])
 # find places to label chromosomes - midpoint between each line
 chrmids = (chrbreaks[1:(length(chrbreaks)-1)] + chrbreaks[2:length(chrbreaks)]) / 2
 
+# find left and right boundaries
+no_cov_threshold = 1e7 # plot gray if there is no SNP coverage for > 10 Mb
+# left boundary is halfway between self and previous SNP, or -10Mb, whichever is closer
+left_distance = pmin(no_cov_threshold,c(0,(gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2))
+gt$rectleft = gt$abspos - left_distance
+right_distance = pmin(no_cov_threshold,c((gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2,0))
+gt$rectright = gt$abspos + right_distance
+
+
+
 # test plotting the chromosome boundaries
 par(mfrow=c(1,1))
 plot(NA,NA,xlim=c(0,max(gt$abspos)),ylim=c(0,1),xaxs='i',axes=FALSE)
@@ -58,20 +73,24 @@ for (colno in plot_order) {
   plot(NA,NA,xlim=range(gt$abspos),ylim=c(0,1),yaxs='i',xaxs='i',
        yaxt='n',xaxt='n',ylab='',xlab='',cex.lab=2)
   mtext(side=2,text=paste(display_names[colno],"  "),las=1)
-  rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col=color_bg)
-
-  het = gt[,colno]==value_het & !is.na(gt[,colno])
-  if (sum(het) > 0) {
-      points(gt$abspos[het],rep(1,sum(het)),col=color_het,type='h',lwd=2,lend=2)
+  rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col=color_bg,border=NA)
+  for (i in 1:dim(gt)[1]) {
+      rect(xleft=gt$rectleft,ybottom=0,xright=gt$rectright,ytop=1,col=colordict[[as.character(gt[i,colno])]])
   }
-  b6 = gt[,colno]==value_b6 & !is.na(gt[,colno])
-  if (sum(b6) > 0) {
-    points(gt$abspos[b6],rep(1,sum(b6)),col=color_b6,type='h',lwd=2,lend=2)
-  }
-  m129 = gt[,colno]==value_129 & !is.na(gt[,colno])
-  if (sum(m129) > 0) {
-    points(gt$abspos[m129],rep(1,sum(m129)),col=color_129,type='h',lwd=2,lend=2)
-  }
+#   
+#   
+#   het = gt[,colno]==value_het & !is.na(gt[,colno])
+#   if (sum(het) > 0) {
+#       points(gt$abspos[het],rep(1,sum(het)),col=color_het,type='h',lwd=2,lend=2)
+#   }
+#   b6 = gt[,colno]==value_b6 & !is.na(gt[,colno])
+#   if (sum(b6) > 0) {
+#     points(gt$abspos[b6],rep(1,sum(b6)),col=color_b6,type='h',lwd=2,lend=2)
+#   }
+#   m129 = gt[,colno]==value_129 & !is.na(gt[,colno])
+#   if (sum(m129) > 0) {
+#     points(gt$abspos[m129],rep(1,sum(m129)),col=color_129,type='h',lwd=2,lend=2)
+#   }
   axis(side=1,at=c(1,chrbreaks),labels=NA)
   if (iteration == length(plot_order)) {
       mtext(side=1,at=chrmids,text=chrlen$chr,cex=.6)  
