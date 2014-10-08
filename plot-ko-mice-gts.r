@@ -8,7 +8,7 @@ color_b6    = '#222222'
 color_129   = '#DB2929' # 
 color_het   = '#685434' # halfway between above
 color_lines = '#FC1501' # gummi red - http://www.december.com/html/spec/color1.html
-color_bg    = '#AAAAAA' # background color
+color_bg    = '#777777' # background color
 
 value_b6  = 1
 value_129 = 0
@@ -66,7 +66,7 @@ plot_order = c(6,5,8,7,9,11,10,12,13,15,14) # which columns to plot, and in what
 display_names = colnames(gt)
 # placeholder - can add nicer-looking names later
 
-pdf('~/d/sci/src/ko_snps/ko-mice-genotypes.pdf',width=8,height=5)
+png('~/d/sci/src/ko_snps/ko-mice-genotypes.png',width=1200,height=800)
 par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
 iteration = 1
 for (colno in plot_order) {
