@@ -27,6 +27,7 @@ chrlen$chrno[chrlen$chr!='X'] = as.integer(chrlen$chr[chrlen$chr!='X'])
 # calculate the "absolute position" where each chromosome starts
 chrlen = chrlen[with(chrlen, order(chrno)),]
 chrlen$startpos = cumsum(as.numeric(chrlen$length)) - chrlen$length + 1
+chrlen$endpos = chrlen$startpos + chrlen$length
 # assign "absolute position" to each position
 gt$abspos = gt$pos + chrlen$startpos[match(gt$chr,chrlen$chr)]
 # double check that absolute positions are monotonically increasing
@@ -54,15 +55,15 @@ display_names = colnames(gt)
 no_cov_threshold = 1e7 # plot gray if there is no SNP coverage for > 10 Mb
 # left boundary is halfway between self and previous SNP, or -10Mb, whichever is closer
 left_distance = pmin(no_cov_threshold,c(0,(gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2))
-gt$rectleft = gt$abspos - left_distance
+gt$rectleft = pmax(gt$abspos - left_distance,chrlen$startpos[match(gt$chr,chrlen$chr)])
 right_distance = pmin(no_cov_threshold,c((gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2,0))
-gt$rectright = gt$abspos + right_distance
+gt$rectright = pmin(gt$abspos + right_distance,chrlen$endpos[match(gt$chr,chrlen$chr)])
 
 pdf('~/R/ko-mice-genotypes.pdf',width=10,height=5)
 par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
 iteration = 1
 for (colno in plot_order) {
-  plot(NA,NA,xlim=range(gt$abspos),ylim=c(0,1),yaxs='i',xaxs='i',
+  plot(NA,NA,xlim=c(0,sum(as.numeric(chrlen$length))),ylim=c(0,1),yaxs='i',xaxs='i',
        yaxt='n',xaxt='n',ylab='',xlab='',cex.lab=2)
   mtext(side=2,text=paste(display_names[colno],"  "),las=1)
   rect(par("usr")[1],par("usr")[3],par("usr")[2],par("usr")[4],col=color_bg)
