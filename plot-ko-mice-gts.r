@@ -14,28 +14,21 @@ value_b6  = 1
 value_129 = 0
 value_het = 0.5
 
-# get lengths of each chromosome (highest SNP pos is fine)
-chrlen = sqldf("
-               select   chr, max(position) maxpos
-               from     gt
-               group by 1
-               order by 1
-               ;")
+chrlen = read.table("grcm38-chrom-lengths.txt",header=TRUE)
 # properly number and sort the chromosomes
 chrlen$chrno = 0
 chrlen$chrno[chrlen$chr=='X'] = 23
 chrlen$chrno[chrlen$chr!='X'] = as.integer(chrlen$chr[chrlen$chr!='X'])
 # calculate the "absolute position" where each chromosome starts
 chrlen = chrlen[with(chrlen, order(chrno)),]
-chrlen$startpos = cumsum(as.numeric(chrlen$maxpos)) - chrlen$maxpos + 1
+chrlen$startpos = cumsum(as.numeric(chrlen$length)) - chrlen$length + 1
 # assign "absolute position" to each position
 gt$abspos = gt$pos + chrlen$startpos[match(gt$chr,chrlen$chr)]
 # double check that absolute positions are monotonically increasing
 any(gt$abspos != cummax(gt$abspos)) # FALSE is good
 # find which SNPs are the highest on their chromosome - for plotting vertical lines at chr breaks
-gt$chrmax = gt$pos == chrlen$maxpos[match(gt$chr,chrlen$chr)]
 # find places to plot vertical lines between chromosomes
-chrbreaks = c(0,gt$abspos[gt$chrmax])
+chrbreaks = c(chrlen$startpos,sum(as.numeric(chrlen$length)))
 # find places to label chromosomes - midpoint between each line
 chrmids = (chrbreaks[1:(length(chrbreaks)-1)] + chrbreaks[2:length(chrbreaks)]) / 2
 
