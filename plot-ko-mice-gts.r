@@ -55,11 +55,11 @@ display_names = colnames(gt)
 no_cov_threshold = 1e7 # plot gray if there is no SNP coverage for > 10 Mb
 # left boundary is halfway between self and previous SNP, or -10Mb, whichever is closer
 left_distance = pmin(no_cov_threshold,c(0,(gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2))
-gt$rectleft = pmax(gt$abspos - left_distance,chrlen$startpos[match(gt$chr,chrlen$chr)])
+gt$rectleft = pmax(gt$abspos - left_distance,chrlen$startpos[match(gt$chr,chrlen$chr)]) - 1 
 right_distance = pmin(no_cov_threshold,c((gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:(dim(gt)[1]-1)])/2,0))
-gt$rectright = pmin(gt$abspos + right_distance,chrlen$endpos[match(gt$chr,chrlen$chr)])
+gt$rectright = pmin(gt$abspos + right_distance,chrlen$endpos[match(gt$chr,chrlen$chr)]) + 1
 
-pdf('~/R/ko-mice-genotypes.pdf',width=10,height=5)
+pdf('ko-mice-genotypes.pdf',width=10,height=5)
 par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
 iteration = 1
 for (colno in plot_order) {
