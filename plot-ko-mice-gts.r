@@ -1,7 +1,7 @@
 options(stringsAsFactors=FALSE)
 require(sqldf)
 setwd('~/d/sci/src/ko_snps')
-gt = read.table('nuvolone-ko-mice-genotypes.txt',sep='\t',header=TRUE)
+gt = read.table('nuvolone-ko-mice-genotypes.tsv',sep='\t',header=TRUE)
 
 colnames(gt) = tolower(colnames(gt)) # lower case column names
 
@@ -20,7 +20,7 @@ colordict[[as.character(value_b6)]] = color_b6
 colordict[[as.character(value_het)]] = color_het
 colordict[[as.character(value_129)]] = color_129
 
-chrlen = read.table("grcm38-chrom-lengths.txt",header=TRUE)
+chrlen = read.table("grcm38-chrom-lengths.tsv",header=TRUE)
 # properly number and sort the chromosomes
 chrlen$chrno = 0
 chrlen$chrno[chrlen$chr=='X'] = 23
