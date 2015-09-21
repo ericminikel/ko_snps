@@ -1,6 +1,7 @@
 options(stringsAsFactors=FALSE)
 require(sqldf)
-gt = read.table('~/R/nuvolone-ko-mice-genotypes.txt',sep='\t',header=TRUE)
+setwd('~/d/sci/src/ko_snps')
+gt = read.table('nuvolone-ko-mice-genotypes.txt',sep='\t',header=TRUE)
 
 colnames(gt) = tolower(colnames(gt)) # lower case column names
 
@@ -46,7 +47,7 @@ mtext(side=1,at=chrmids,text=chrlen$chr)
 
 colnames(gt)
 
-plot_order = c(5,6,7,10,9,8,11,12,13,14,15) # which columns to plot, and in what order
+plot_order = c(6,7,10,9,8,11,12,13,14,16) # which columns to plot, and in what order
 display_names = colnames(gt)
 # placeholder - can add nicer-looking names later
 
