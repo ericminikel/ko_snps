@@ -47,8 +47,9 @@ mtext(side=1,at=chrmids,text=chrlen$chr)
 
 colnames(gt)
 
-plot_order = c(6,7,10,9,8,11,12,13,14,16) # which columns to plot, and in what order
+plot_order = c(6,7,8,9,10,11,12,13,14,15,16) # which columns to plot, and in what order
 display_names = colnames(gt)
+display_names[plot_order] = c("C57BL/6J reference","B6 wild-type","Zurich III","Nagasaki","GFP","Zurich I","RIKEN","Zurich II","Edinburgh","129/Ola wild-type","129S6 reference")
 # placeholder - can add nicer-looking names later
 
 
@@ -61,7 +62,7 @@ right_distance = pmin(no_cov_threshold,c((gt$abspos[2:(dim(gt)[1])]-gt$abspos[1:
 gt$rectright = pmin(gt$abspos + right_distance,chrlen$endpos[match(gt$chr,chrlen$chr)]) + 1
 
 pdf('ko-mice-genotypes.pdf',width=10,height=5)
-par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,3,3,1))
+par(mfrow=c(length(plot_order)+1,1),mar=c(.2,5,.2,1),oma=c(2,8,3,1))
 iteration = 1
 for (colno in plot_order) {
   plot(NA,NA,xlim=c(0,sum(as.numeric(chrlen$length))),ylim=c(0,1),yaxs='i',xaxs='i',
